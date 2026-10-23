@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ponto Fácil</title>
+<meta name="description" content="App Android para horistas: registro de ponto, banco de horas e cálculo do pagamento. Versão 1.4 (beta).">
+<meta name="theme-color" content="#0F1420">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Ponto Fácil">
+<meta property="og:description" content="Seu ponto, suas horas e seu pagamento no celular. Versão 1.4 (beta).">
+<meta property="og:image" content="icone.png">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.png" sizes="64x64">
+<link rel="apple-touch-icon" href="icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0F1420; --bg2:#0B101A; --s:#171E2C; --s2:#1F2838; --b:#2A3446;
+  --t:#E8ECF3; --d:#C4CCD8; --m:#9AA6B8; --a:#4C8DFF; --a2:#2F6BFF; --a3:#1D4ED8;
+  --g:#3FCF8E; --o:#FFA94D; --r:#FF7A7A; --on:#0B1220;
+  --raio:18px; --largura:1120px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--t);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:#7AA8FF}
+a:hover{color:#A9C6FF}
+:focus-visible{outline:3px solid var(--a);outline-offset:3px;border-radius:8px}
+.box{width:100%;max-width:var(--largura);margin:0 auto;padding:0 16px}
+@media (min-width:720px){.box{padding:0 28px}}
+
+/* Barra do topo */
+.topo{position:sticky;top:0;z-index:10;background:rgba(15,20,32,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(42,52,70,.7)}
+.topo .box{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:62px}
+.marca{display:flex;align-items:center;gap:10px;color:var(--t);text-decoration:none;font-weight:700;font-size:17px;letter-spacing:-.01em}
+.marca img{width:34px;height:34px;border-radius:10px}
+.fa{background:linear-gradient(90deg,#4C9BFF,#19C39A);-webkit-background-clip:text;background-clip:text;color:transparent}
+.marca small{font-weight:600;font-size:12px;color:var(--m);margin-left:2px}
+.topo nav{display:flex;align-items:center;gap:6px}
+.topo nav a.link{display:none;color:var(--d);text-decoration:none;font-size:14px;font-weight:500;padding:10px 12px;border-radius:10px}
+.topo nav a.link:hover{background:var(--s);color:var(--t)}
+@media (min-width:820px){.topo nav a.link{display:inline-block}}
+
+/* Botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 20px;border-radius:14px;border:0;font:700 15px/1 Inter,system-ui,sans-serif;text-decoration:none;cursor:pointer;transition:transform .12s ease,background .15s ease}
+.btn:active{transform:scale(.98)}
+.btn-main{background:var(--a);color:var(--on)}
+.btn-main:hover{background:#6BA0FF;color:var(--on)}
+.btn-sec{background:var(--s);color:var(--t);border:1px solid var(--b)}
+.btn-sec:hover{background:var(--s2);color:var(--t)}
+.btn-sm{min-height:40px;padding:0 14px;font-size:14px;border-radius:12px}
+.btn svg{flex:none}
+
+/* Abertura */
+.hero{position:relative;padding:44px 0 28px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-30% -10% auto auto;width:720px;height:720px;background:radial-gradient(closest-side,rgba(47,107,255,.28),rgba(47,107,255,0) 70%);pointer-events:none}
+.hero .box{position:relative;display:grid;gap:36px;align-items:center}
+@media (min-width:900px){.hero{padding:72px 0 48px}.hero .box{grid-template-columns:1.1fr .9fr;gap:48px}}
+.selo{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;background:rgba(255,169,77,.12);border:1px solid rgba(255,169,77,.35);color:#FFC58A;font-size:13px;font-weight:600}
+.selo b{background:var(--o);color:#2A1500;border-radius:999px;padding:2px 8px;font-size:12px}
+h1{margin:16px 0 14px;font-size:clamp(34px,7.4vw,58px);line-height:1.04;letter-spacing:-.035em;font-weight:800}
+h1 span{background:linear-gradient(90deg,#4C9BFF,#19C39A);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.lead{margin:0 0 24px;font-size:clamp(16px,2.2vw,19px);color:var(--d);max-width:34em}
+.acoes{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.acoes .btn-main{min-height:56px;padding:0 24px;font-size:16px;box-shadow:0 12px 30px rgba(76,141,255,.35)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:14px;color:var(--m);font-size:13px}
+.meta span{display:inline-flex;align-items:center;gap:6px}
+.meta i{width:6px;height:6px;border-radius:3px;background:var(--g);display:inline-block}
+
+.celular{position:relative;justify-self:center;width:min(300px,78vw)}
+.celular .moldura{border-radius:42px;padding:10px;background:linear-gradient(160deg,#2B3550,#121826);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.06)}
+.celular img{border-radius:32px;width:100%;height:auto;aspect-ratio:390/844}
+.flutua{position:absolute;background:var(--s);border:1px solid var(--b);border-radius:14px;padding:10px 12px;font-size:12px;color:var(--m);box-shadow:0 14px 30px rgba(0,0,0,.45)}
+.flutua b{display:block;font-size:16px;color:var(--t)}
+.flutua.f1{left:-28px;top:28%}
+.flutua.f2{right:-24px;bottom:18%}
+.flutua.f1 b{color:var(--g)}
+@media (max-width:420px){.flutua.f1{left:-8px}.flutua.f2{right:-8px}}
+
+/* Aviso de desenvolvimento */
+.aviso{display:flex;gap:14px;align-items:flex-start;margin:8px 0 0;padding:16px;border-radius:var(--raio);background:linear-gradient(0deg,rgba(255,169,77,.08),rgba(255,169,77,.08)),var(--s);border:1px solid rgba(255,169,77,.4)}
+.aviso .ic{width:40px;height:40px;flex:none;border-radius:12px;background:rgba(255,169,77,.16);color:var(--o);display:flex;align-items:center;justify-content:center}
+.aviso h2{margin:0 0 4px;font-size:16px}
+.aviso p{margin:0;color:var(--d);font-size:14px}
+
+/* Seções */
+section{padding:56px 0}
+@media (min-width:900px){section{padding:80px 0}}
+.titulo{max-width:640px;margin-bottom:28px}
+.rot{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--a);text-transform:uppercase;margin-bottom:8px}
+h2.h{margin:0 0 10px;font-size:clamp(26px,4.6vw,38px);line-height:1.12;letter-spacing:-.025em}
+.titulo p{margin:0;color:var(--d)}
+
+.recursos{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:600px){.recursos{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:960px){.recursos{grid-template-columns:repeat(3,1fr)}}
+.rec{background:var(--s);border:1px solid var(--b);border-radius:var(--raio);padding:18px}
+.rec .k{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:34px;padding:0 10px;border-radius:10px;background:rgba(76,141,255,.14);color:#8EB5FF;font-weight:800;font-size:14px;margin-bottom:12px;letter-spacing:-.01em}
+.rec h3{margin:0 0 6px;font-size:17px}
+.rec p{margin:0;color:var(--m);font-size:14px}
+
+/* Prints */
+.galeria{display:grid;grid-auto-flow:column;grid-auto-columns:min(72vw,260px);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 18px;margin:0 -16px;scrollbar-width:thin}
+.galeria figure{margin:0;scroll-snap-align:center}
+.galeria .moldura{border-radius:34px;padding:8px;background:linear-gradient(160deg,#2B3550,#121826);box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.galeria img{border-radius:27px;width:100%;height:auto;aspect-ratio:390/844}
+.galeria figcaption{margin-top:12px;text-align:center}
+.galeria figcaption b{display:block;font-size:15px}
+.galeria figcaption span{color:var(--m);font-size:13px}
+@media (min-width:980px){.galeria{grid-auto-flow:row;grid-template-columns:repeat(4,1fr);overflow:visible;margin:0;padding:4px 0 0}}
+.dica{color:var(--m);font-size:13px;margin-top:4px}
+@media (min-width:980px){.dica{display:none}}
+
+/* Instalação */
+.passos{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));counter-reset:p}
+.passo{background:var(--s);border:1px solid var(--b);border-radius:var(--raio);padding:18px 18px 18px 64px;position:relative;counter-increment:p}
+.passo::before{content:counter(p);position:absolute;left:18px;top:18px;width:32px;height:32px;border-radius:10px;background:var(--a);color:var(--on);font-weight:800;display:flex;align-items:center;justify-content:center}
+.passo h3{margin:4px 0 4px;font-size:16px}
+.passo p{margin:0;color:var(--m);font-size:14px}
+
+/* Formulário */
+.contato{display:grid;gap:24px}
+@media (min-width:900px){.contato{grid-template-columns:.85fr 1.15fr;gap:40px;align-items:start}}
+form{background:var(--s);border:1px solid var(--b);border-radius:22px;padding:20px;display:grid;gap:14px}
+@media (min-width:720px){form{padding:26px}}
+.duplo{display:grid;gap:14px}
+@media (min-width:560px){.duplo{grid-template-columns:1fr 1fr}}
+label{display:block;font-size:13px;font-weight:600;color:var(--d);margin-bottom:6px}
+label small{font-weight:400;color:var(--m)}
+input[type=text],textarea{width:100%;min-height:48px;padding:12px 14px;border-radius:12px;border:1px solid var(--b);background:var(--bg);color:var(--t);font:500 15px Inter,system-ui,sans-serif}
+textarea{min-height:140px;resize:vertical;line-height:1.45}
+input::placeholder,textarea::placeholder{color:#6B778A}
+input:focus,textarea:focus{outline:none;border-color:var(--a);box-shadow:0 0 0 3px rgba(76,141,255,.25)}
+fieldset{border:0;margin:0;padding:0}
+legend{font-size:13px;font-weight:600;color:var(--d);margin-bottom:6px;padding:0}
+.tipos{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:14px;background:var(--bg)}
+.tipos input{position:absolute;opacity:0;pointer-events:none}
+.tipos label{margin:0;min-height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:14px;color:var(--d);cursor:pointer}
+.tipos input:checked+label{background:var(--a);color:var(--on)}
+.tipos input:focus-visible+label{outline:3px solid var(--a);outline-offset:2px}
+.oculto{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.status{min-height:22px;font-size:14px;font-weight:600}
+.status.ok{color:var(--g)} .status.erro{color:var(--r)}
+.lista{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.lista li{display:flex;gap:10px;color:var(--d);font-size:15px}
+.lista svg{flex:none;margin-top:3px;color:var(--g)}
+
+/* Rodapé */
+footer{border-top:1px solid var(--b);background:var(--bg2);padding:32px 0 calc(32px + env(safe-area-inset-bottom))}
+footer .box{display:grid;gap:18px}
+@media (min-width:720px){footer .box{grid-template-columns:1fr auto;align-items:center}}
+.cred{display:flex;align-items:center;gap:12px}
+.cred img{width:44px;height:44px;border-radius:12px}
+.cred b{display:block;font-size:16px}
+.cred span{color:var(--m);font-size:13px}
+.cred strong{color:var(--t)}
+.rodape-links{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px}
+.rodape-links a{color:var(--d);text-decoration:none}
+.rodape-links a:hover{color:var(--t)}
+.fino{grid-column:1/-1;color:var(--m);font-size:12px;margin:0}
+
+
+/* Faixa de aviso (do painel) */
+.faixa{background:rgba(76,141,255,.14);border-bottom:1px solid rgba(76,141,255,.4);color:#CFE0FF;font-size:14px;font-weight:600}
+.faixa .box{padding-top:10px;padding-bottom:10px}
+.faixa.alerta{background:rgba(255,169,77,.14);border-color:rgba(255,169,77,.45);color:#FFD9B0}
+.faixa.sucesso{background:rgba(63,207,142,.14);border-color:rgba(63,207,142,.45);color:#C6F3DE}
+.novidades{background:var(--s);border:1px solid var(--b);border-radius:var(--raio);padding:18px 20px}
+.novidades ul{margin:6px 0 0;padding-left:20px;color:var(--d)}
+.novidades li{margin:4px 0}
+.btn.bloq{background:var(--s2);color:var(--m);box-shadow:none;cursor:not-allowed;border:1px dashed var(--b)}
+.btn.bloq:hover{background:var(--s2);color:var(--m)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="box">
+    <a class="marca" href="#inicio" aria-label="Ponto Fácil, início">
+      <img src="icone.png" alt="" width="34" height="34">
+      <span>Ponto <span class="fa">Fácil</span> <small>v<span data-v>1.4</span></small></span>
+    </a>
+    <nav aria-label="Seções">
+      <a class="link" href="#recursos">Recursos</a>
+      <a class="link" href="#telas">Telas</a>
+      <a class="link" href="#instalar">Instalar</a>
+      <a class="link" href="#sugestao">Sugestão</a>
+      <a class="btn btn-main btn-sm dl" href="PontoFacil.apk" download="PontoFacil.apk" type="application/vnd.android.package-archive">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+        Baixar
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="faixa" id="faixa" role="status" hidden><div class="box" id="faixa-txt"></div></div>
+
+<main id="inicio">
+  <div class="hero">
+    <div class="box">
+      <div>
+        <span class="selo" data-beta><b>BETA</b> Versão <span data-v>1.4</span> · em desenvolvimento</span>
+        <h1>Seu ponto, suas horas e <span>seu pagamento</span> no celular.</h1>
+        <p class="lead">Registre entrada e saída em um toque, acompanhe o banco de horas e veja quanto vai cair no dia 20 e no dia 5. Feito para quem trabalha por hora.</p>
+        <div class="acoes">
+          <a class="btn btn-main dl" href="PontoFacil.apk" download="PontoFacil.apk" type="application/vnd.android.package-archive">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+            Baixar APK para Android
+          </a>
+          <a class="btn btn-sec" href="#telas">Ver as telas</a>
+        </div>
+        <div class="meta">
+          <span><i></i>Versão <span data-v>1.4</span></span>
+          <span data-tam>APK de 19 MB</span>
+          <span>Atualizado em <span data-data>23/10/2026</span></span>
+          <span>Android 7 ou mais novo</span>
+        </div>
+      </div>
+      <div class="celular">
+        <div class="moldura"><img src="img/ponto.webp" alt="Tela Registro de Ponto: 220h00 de 220h00, meta atingida, lista da folha de 20/08 a 19/09" width="390" height="844"></div>
+        <div class="flutua f1" aria-hidden="true">Adiantamento dia 20<b>R$ 720,00</b></div>
+        <div class="flutua f2" aria-hidden="true">Hora extra<b style="color:var(--o)">+1h30 · 50%</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="aviso" role="note" data-beta>
+      <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5h.01"/></svg></span>
+      <div>
+        <h2>App em desenvolvimento: pode ter bugs</h2>
+        <p>Esta é a versão <span data-v>1.4</span> (beta). Os valores mostrados são estimativas, e o holerite da empresa é sempre o documento oficial. Encontrou algo errado? <a href="#sugestao">Conte na caixa de sugestões</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <section id="novidades" hidden style="padding-bottom:0">
+    <div class="box">
+      <div class="novidades">
+        <span class="rot">Novidades da versão <span data-v>1.4</span></span>
+        <ul id="novidades-lista"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="recursos">
+    <div class="box">
+      <div class="titulo">
+        <span class="rot">O que tem no app</span>
+        <h2 class="h">Tudo o que entra no seu holerite, na palma da mão</h2>
+        <p>As contas seguem as regras da folha: período de 20 a 19, 220 horas previstas e hora extra só depois do horário.</p>
+      </div>
+      <div class="recursos">
+        <div class="rec"><span class="k">1 toque</span><h3>Bater o ponto</h3><p>Botão de entrada e saída na tela inicial. Dá para corrigir o horário depois, com rodinhas de 00 a 23h.</p></div>
+        <div class="rec"><span class="k">10h</span><h3>Dia certo, sem conta</h3><p>Das 07:00 às 16:00 mais 1h abonada conta 10h. Tolerância de 15 minutos na entrada e na saída.</p></div>
+        <div class="rec"><span class="k">220h</span><h3>Meta do mês</h3><p>Mostra quantas horas você já fez na folha e quantas faltam. Feriado sem trabalhar é abonado e vira +10h no banco.</p></div>
+        <div class="rec"><span class="k">17:00</span><h3>Hora extra</h3><p>50% em dia útil, só depois das 17:00. Sábado trabalhado é tudo 70%; domingo e feriado, tudo 100%. Cada uma tem sua caixinha.</p></div>
+        <div class="rec"><span class="k">±</span><h3>Banco de horas</h3><p>Ligado ao ponto. Some ou tire horas, compense folgas, receba em dinheiro ou zere o saldo.</p></div>
+        <div class="rec"><span class="k">R$</span><h3>Quanto vou receber</h3><p>Adiantamento no dia 20 e o restante no dia 5, com INSS, gratificação, ajuda de custo e descontos.</p></div>
+        <div class="rec"><span class="k">18h</span><h3>Avisos com som</h3><p>Lembra de bater o ponto e avisa na véspera do pagamento. Se o dia 5 cair no domingo, paga na sexta.</p></div>
+        <div class="rec"><span class="k">PDF</span><h3>Relatório da folha</h3><p>Todos os dias, horas e valores em um PDF para conferir ou mandar pelo WhatsApp.</p></div>
+        <div class="rec"><span class="k">Offline</span><h3>Funciona sem internet</h3><p>Fica tudo salvo no celular e sincroniza sozinho quando a internet volta. Cada um vê só os próprios dados.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="telas" style="background:linear-gradient(180deg,var(--bg),var(--bg2))">
+    <div class="box">
+      <div class="titulo">
+        <span class="rot">Prints</span>
+        <h2 class="h">Como ele é por dentro</h2>
+        <p>Tema escuro, letras grandes e botões fáceis de apertar com luva.</p>
+      </div>
+      <div class="galeria" tabindex="0" aria-label="Telas do aplicativo">
+        <figure><div class="moldura"><img src="img/ponto.webp" alt="Tela Ponto com total de horas da folha e registros do dia" loading="lazy" width="390" height="844"></div><figcaption><b>Ponto</b><span>Horas da folha somadas dia a dia</span></figcaption></figure>
+        <figure><div class="moldura"><img src="img/pagamento.webp" alt="Tela Pagamento com adiantamento, restante, proventos e descontos" loading="lazy" width="390" height="844"></div><figcaption><b>Pagamento</b><span>Adiantamento, restante e líquido</span></figcaption></figure>
+        <figure><div class="moldura"><img src="img/banco.webp" alt="Tela Banco de Horas com saldo e histórico" loading="lazy" width="390" height="844"></div><figcaption><b>Banco de horas</b><span>Saldo ligado ao ponto</span></figcaption></figure>
+        <figure><div class="moldura"><img src="img/registro.webp" alt="Tela de registro com seletor de horário em rodinhas" loading="lazy" width="390" height="844"></div><figcaption><b>Registro</b><span>Horário em rodinhas de 24h</span></figcaption></figure>
+      </div>
+      <p class="dica">Arraste para o lado para ver mais telas.</p>
+    </div>
+  </section>
+
+  <section id="instalar">
+    <div class="box">
+      <div class="titulo">
+        <span class="rot">Instalação</span>
+        <h2 class="h">Instale em 3 passos</h2>
+        <p>O app não está na Play Store. Você baixa o arquivo aqui e instala direto no celular.</p>
+      </div>
+      <div class="passos">
+        <div class="passo"><h3>Baixe o APK</h3><p>Toque em “Baixar APK” pelo celular. O arquivo PontoFacil.apk vai para a pasta Downloads.</p></div>
+        <div class="passo"><h3>Permita a instalação</h3><p>Abra o arquivo. Se o Android pedir, toque em Configurações e ative “Permitir desta fonte”.</p></div>
+        <div class="passo"><h3>Entre na sua conta</h3><p>Use o usuário e a senha que o administrador passou. No primeiro acesso você cria a sua senha.</p></div>
+      </div>
+      <div style="margin-top:20px">
+        <a class="btn btn-main dl" href="PontoFacil.apk" download="PontoFacil.apk" type="application/vnd.android.package-archive">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+          Baixar versão <span data-v>1.4</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="sugestao" style="background:linear-gradient(180deg,var(--bg),var(--bg2))">
+    <div class="box contato">
+      <div>
+        <span class="rot">Fale com o desenvolvedor</span>
+        <h2 class="h">Achou um bug ou tem uma ideia?</h2>
+        <p style="color:var(--d);margin:0">Sua mensagem vai direto para o e-mail do desenvolvedor. Quanto mais detalhe, mais rápido sai a correção.</p>
+        <ul class="lista">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Diga em qual tela aconteceu</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Conte o que você fez antes do erro</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Informe o modelo do celular</li>
+        </ul>
+      </div>
+
+      <form id="form" novalidate>
+        <fieldset>
+          <legend>O que você quer enviar?</legend>
+          <div class="tipos">
+            <input type="radio" name="tipo" id="t-bug" value="Bug" checked><label for="t-bug">Bug</label>
+            <input type="radio" name="tipo" id="t-sug" value="Sugestão"><label for="t-sug">Sugestão</label>
+            <input type="radio" name="tipo" id="t-out" value="Outro"><label for="t-out">Outro</label>
+          </div>
+        </fieldset>
+        <div class="duplo">
+          <div><label for="nome">Nome <small>(opcional)</small></label><input type="text" id="nome" name="nome" maxlength="80" autocomplete="name" placeholder="Como quer ser chamado"></div>
+          <div><label for="contato">WhatsApp ou e-mail <small>(opcional)</small></label><input type="text" id="contato" name="contato" maxlength="120" autocomplete="email" placeholder="Para eu te responder"></div>
+        </div>
+        <div><label for="celular">Modelo do celular <small>(opcional)</small></label><input type="text" id="celular" name="celular" maxlength="80" placeholder="Ex.: Samsung A15, Moto G54"></div>
+        <div><label for="msg">Mensagem</label><textarea id="msg" name="msg" maxlength="2000" required placeholder="Ex.: Na aba Pagamento, o adiantamento aparece errado depois que..."></textarea></div>
+        <div class="oculto" aria-hidden="true"><label for="site">Não preencha</label><input type="text" id="site" name="_honey" tabindex="-1" autocomplete="off"></div>
+        <button class="btn btn-main" type="submit" id="enviar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l16-8-6 16-3-6z"/><path d="M11 14l9-10"/></svg>
+          Enviar mensagem
+        </button>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="box">
+    <div class="cred">
+      <img src="icone.png" alt="" width="44" height="44">
+      <div>
+        <b>Ponto Fácil · versão <span data-v>1.4</span><span data-beta> (beta)</span></b>
+        <span>Desenvolvido por <strong>LordStrik</strong> · © 2026</span>
+      </div>
+    </div>
+    <nav class="rodape-links" aria-label="Rodapé">
+      <a href="#recursos">Recursos</a>
+      <a href="#telas">Telas</a>
+      <a href="#instalar">Instalar</a>
+      <a href="#sugestao">Reportar bug</a>
+      <a href="admin.html">Área do administrador</a>
+    </nav>
+    <p class="fino">Projeto independente desenvolvido por LordStrik. Valores estimados pelo app; o holerite da empresa é o documento oficial.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var FORM = 'lordstrik201@gmail.com';
+  var SB = 'https://yksazlqhayyrziwaqytb.supabase.co';
+  var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlrc2F6bHFoYXl5cnppd2FxeXRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MzgwMzYsImV4cCI6MjEwODIxNDAzNn0.Dm8Iw_8MKeO9_Gh05BUkr9rPa1PGyaWVFYEzlCK1AKY';
+  var VERSAO = '1.4';
+  var temSB = SB.indexOf('__') !== 0;
+  var versaoId = null;
+  var bloqueado = false;
+  var urlAtiva = null;
+  var form = document.getElementById('form');
+  var status = document.getElementById('status');
+  var botao = document.getElementById('enviar');
+  function cab(extra) {
+    var h = { 'apikey': ANON, 'Authorization': 'Bearer ' + ANON };
+    for (var k in (extra || {})) h[k] = extra[k];
+    return h;
+  }
+  function todos(sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
+
+  // Versão no ar (enviada pelo painel do admin). Sem ela, fica o APK do script.
+  if (temSB) {
+    fetch(SB + '/rest/v1/site_versoes?ativa=eq.true&select=id,versao,notas,arquivo,tamanho,created_at&limit=1', { headers: cab() })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (l) {
+        var v = l && l[0];
+        if (!v) return;
+        // Só usa a versão do painel se ela for igual ou mais nova que a do site.
+        var cmp = function (a, b) {
+          var x = String(a).split('.').map(Number), y = String(b).split('.').map(Number);
+          for (var i = 0; i < Math.max(x.length, y.length); i++) {
+            var d = (x[i] || 0) - (y[i] || 0);
+            if (d) return d;
+          }
+          return 0;
+        };
+        if (cmp(v.versao, VERSAO) < 0) return;
+        versaoId = v.id;
+        VERSAO = v.versao;
+        var url = SB + '/storage/v1/object/public/apk/' + encodeURIComponent(v.arquivo) + '?download=PontoFacil.apk';
+        urlAtiva = url;
+        if (!bloqueado) todos('a.dl', function (a) { a.href = url; });
+        todos('[data-v]', function (el) { el.textContent = v.versao; });
+        todos('[data-tam]', function (el) { el.textContent = 'APK de ' + Math.round(v.tamanho / 1048576) + ' MB'; });
+        todos('[data-data]', function (el) { el.textContent = new Date(v.created_at).toLocaleDateString('pt-BR'); });
+        var linhas = (v.notas || '').split(/\n+/).map(function (s) { return s.replace(/^[-•*]\s*/, '').trim(); }).filter(Boolean);
+        if (linhas.length) {
+          var ul = document.getElementById('novidades-lista');
+          linhas.forEach(function (s) { var li = document.createElement('li'); li.textContent = s; ul.appendChild(li); });
+          document.getElementById('novidades').hidden = false;
+        }
+      }).catch(function () {});
+
+    fetch(SB + '/rest/v1/site_config?id=eq.1&select=aviso,aviso_tipo,beta,downloads_bloqueados,bloqueio_msg', { headers: cab() })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (l) {
+        var c = l && l[0];
+        if (!c) return;
+        if (c.beta === false) todos('[data-beta]', function (el) { el.hidden = true; });
+        if (c.downloads_bloqueados) {
+          bloqueado = true;
+          todos('a.dl', function (a) {
+            a.removeAttribute('href');
+            a.removeAttribute('download');
+            a.setAttribute('aria-disabled', 'true');
+            a.classList.add('bloq');
+            a.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' +
+              (a.classList.contains('btn-sm') ? 'Manutenção' : 'Download em manutenção');
+          });
+          var fm = document.getElementById('faixa');
+          if (!c.aviso) {
+            document.getElementById('faixa-txt').textContent = c.bloqueio_msg || 'Downloads pausados para manutenção. Volte daqui a pouco.';
+            fm.className = 'faixa alerta';
+            fm.hidden = false;
+          }
+        }
+        if (c.aviso) {
+          var f = document.getElementById('faixa');
+          document.getElementById('faixa-txt').textContent = c.aviso;
+          f.className = 'faixa ' + (c.aviso_tipo || 'info');
+          f.hidden = false;
+        }
+      }).catch(function () {});
+
+    // Conta os downloads da versão no ar.
+    todos('a.dl', function (a) {
+      a.addEventListener('click', function (ev) {
+        if (bloqueado) { ev.preventDefault(); return; }
+        if (!versaoId) return;
+        fetch(SB + '/rest/v1/rpc/contar_download', {
+          method: 'POST', keepalive: true,
+          headers: cab({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ p_id: versaoId })
+        }).catch(function () {});
+      });
+    });
+  }
+
+  function mostrar(texto, tipo) {
+    status.textContent = texto;
+    status.className = 'status ' + (tipo || '');
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var msg = form.msg.value.trim();
+    if (msg.length < 5) {
+      mostrar('Escreva a mensagem (pelo menos 5 letras).', 'erro');
+      form.msg.focus();
+      return;
+    }
+    if (form._honey.value) { mostrar('Mensagem enviada. Obrigado!', 'ok'); form.reset(); return; }
+    if (FORM.indexOf('__') === 0) { mostrar('Prévia: o envio funciona depois que o site for publicado.', 'erro'); return; }
+
+    var tipo = form.querySelector('input[name=tipo]:checked').value;
+    var nome = form.nome.value.trim(), contato = form.contato.value.trim(), celular = form.celular.value.trim();
+    botao.disabled = true;
+    mostrar('Enviando…');
+
+    // 1) E-mail para o desenvolvedor
+    var email = fetch('https://formsubmit.co/ajax/' + FORM, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: '[Ponto Fácil] ' + tipo + ' — v' + VERSAO,
+        _template: 'table',
+        _captcha: 'false',
+        Tipo: tipo,
+        Nome: nome || '(não informado)',
+        Contato: contato || '(não informado)',
+        Celular: celular || '(não informado)',
+        Versao: VERSAO,
+        Navegador: navigator.userAgent,
+        Mensagem: msg
+      })
+    }).then(function (r) { return r.json(); }).then(function (j) { return String(j.success) === 'true'; }).catch(function () { return false; });
+
+    // 2) Cópia no painel do admin
+    var banco = !temSB ? Promise.resolve(false) : fetch(SB + '/rest/v1/feedback', {
+      method: 'POST',
+      headers: cab({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({
+        tipo: tipo === 'Bug' ? 'problema' : 'sugestao',
+        nome: nome.slice(0, 80) || null, contato: contato.slice(0, 120) || null,
+        celular: celular.slice(0, 80) || null, versao: VERSAO.slice(0, 20), texto: msg.slice(0, 2000)
+      })
+    }).then(function (r) { return r.ok; }).catch(function () { return false; });
+
+    Promise.all([email, banco]).then(function (r) {
+      if (r[0] || r[1]) {
+        mostrar('Mensagem enviada. Obrigado por ajudar a melhorar o app!', 'ok');
+        form.reset();
+      } else {
+        mostrar('Não foi possível enviar agora. Confira a internet e tente de novo.', 'erro');
+      }
+      botao.disabled = false;
+    });
+  });
+})();
+</script>
+</body>
+</html>
